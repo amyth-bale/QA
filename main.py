@@ -2,6 +2,8 @@ import time
 
 from selenium import webdriver
 from selenium.webdriver.common.by import By
+from selenium.webdriver.common.action_chains import ActionChains
+import random
 
 # Credentials & Constants
 email = "ab@gmail.com"
@@ -75,16 +77,28 @@ def search(driver,text):
 #Checking if sort is right
 #First order is none, then on click ascending, then descending
 
-def order(driver,text):
-    time.sleep(timeout)
-    search_field = driver.find_element(By.XPATH,'//input')
-    search_field.send_keys(text)
-    time.sleep(2)
+def order(driver):
+
+    action = ActionChains(driver)
+    print("Invoking scroll to top")
+    while True:
+        for_parent_of_first = driver.find_elements(By.XPATH, "//div[@data-rowindex = '1']")
+        res = driver.find_elements(By.XPATH, '//div[@data-field="name"]/div[text()]')
+        action.scroll_to_element(res[0]).perform()
+        if for_parent_of_first:
+            res = driver.find_element(By.XPATH, '//div[@data-rowindex = "1"]/div[@data-field="name"]/div[text()]')
+            break
+        time.sleep(timeout)
 
     nh = driver.find_element(By.XPATH,'//div[@class="MuiDataGrid-columnHeaderTitleContainer"]')
     
-    nh.click()
-    nh.click() #descending
+    
+    #no click for none
+    nh.click() #one click for ascending
+    nh.click() # two for descending
+    #Cyclic Order
+
+
     time.sleep(2)
 
     name_heading = driver.find_element(By.XPATH,'//div[@aria-label="Name"]')
@@ -115,7 +129,6 @@ def order(driver,text):
         
         if order_by=='ascending':
             temp_list.sort()
-            print(temp_list == character_list)
             if temp_list == character_list:
                 
                 print("Ascending Order Validated")
@@ -146,8 +159,8 @@ print("User is Logged In")
 print("Verifying Search")
 search(website,text)
 
-# print("Order Validation")
-# order(website,"morty")
+print("Order Validation")
+order(website)
 
 
 
